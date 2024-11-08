@@ -32,10 +32,10 @@
 #include "logging/Logger.h"
 
 /*New implemenation of controller sleep mode*/
-// #include "BMI160.h"
-// #include <LowPower.h>
-// BMI160 sensorBMI160;
-// unsigned long lastMotionTime = 0;
+#include "BMI160.h"
+#include <LowPower.h>
+BMI160 sensorBMI160;
+unsigned long lastMotionTime = 0;
 
 Timer<> globalTimer;
 SlimeVR::Logging::Logger logger("SlimeVR");
@@ -113,28 +113,28 @@ void setup()
     sensorManager.postSetup();
 
             /* NEW IMPLEMENTATION OF CONTROLLER SLEEP MODE */
-    // sensorBMI160.initialize();
-    // sensorBMI160.setIntMotionEnabled(true);
-    // lastMotionTime = millis();
+    sensorBMI160.initialize();
+    sensorBMI160.setIntMotionEnabled(true);
+    lastMotionTime = millis();
             /*end of sleep mode implementation */
 
     loopTime = micros();
 }
 
  /* NEW IMPLEMENTATION OF CONTROLLER SLEEP MODE */
-// void enterSleepMode() {
-//     Serial.println("Entering sleep mode...");
-//     // Check if motion is detected before going into sleep mode
-//     bool motionDetected = sensorBMI160.getIntMotionStatus();
-//     if (motionDetected) {
-//         Serial.println("Motion detected, not entering sleep mode.");
-//         return; // If motion is detected, do not enter sleep mode
-//     }
+void enterSleepMode() {
+    Serial.println("Entering sleep mode...");
+    // Check if motion is detected before going into sleep mode
+    bool motionDetected = sensorBMI160.getIntMotionStatus();
+    if (motionDetected) {
+        Serial.println("Motion detected, not entering sleep mode.");
+        return; // If motion is detected, do not enter sleep mode
+    }
 
-//     // Enter power-down state, device will wake up when motion is detected (via getIntMotionStatus)
-//     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); // Sleep until an interrupt occurs (motion detected)
-//     Serial.println("Woke up from sleep mode...");
-// }
+    // Enter power-down state, device will wake up when motion is detected (via getIntMotionStatus)
+    LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); // Sleep until an interrupt occurs (motion detected)
+    Serial.println("Woke up from sleep mode...");
+}
 /* End of sleep mode implementation */
 
 void loop()
@@ -147,13 +147,13 @@ void loop()
     battery.Loop();
     ledManager.update();
  /* NEW IMPLEMENTATION OF CONTROLLER SLEEP MODE */
-    //    if (sensorBMI160.getIntMotionStatus()) {
-    //     // Serial.println("Motion detected.");
-    //     lastMotionTime = millis();
-    // }
-    // if (millis() - lastMotionTime >= 300000) { // 5 minutes
-    //     enterSleepMode();
-    // }
+       if (sensorBMI160.getIntMotionStatus()) {
+        // Serial.println("Motion detected.");
+        lastMotionTime = millis();
+    }
+    if (millis() - lastMotionTime >= 300000) { // 5 minutes
+        enterSleepMode();
+    }
 /* NEW IMPLEMENTATION OF CONTROLLER SLEEP MODE */
 
 #ifdef TARGET_LOOPTIME_MICROS
