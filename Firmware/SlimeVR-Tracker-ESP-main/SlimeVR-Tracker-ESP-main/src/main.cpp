@@ -32,9 +32,9 @@
 #include "logging/Logger.h"
 
 /*New implemenation of controller sleep mode*/
-#include "BMI160.h"
+#include "SensorFusionRestDetect.h"
 #include <LowPower.h>
-BMI160 sensorBMI160;
+SensorFusionRestDetect sensorBMI160;
 unsigned long lastMotionTime = 0;
 
 Timer<> globalTimer;
@@ -113,8 +113,7 @@ void setup()
     sensorManager.postSetup();
 
             /* NEW IMPLEMENTATION OF CONTROLLER SLEEP MODE */
-    sensorBMI160.initialize();
-    sensorBMI160.setIntMotionEnabled(true);
+    
     lastMotionTime = millis();
             /*end of sleep mode implementation */
 
@@ -125,14 +124,12 @@ void setup()
 void enterSleepMode() {
     Serial.println("Entering sleep mode...");
     // Check if motion is detected before going into sleep mode
-    bool motionDetected = sensorBMI160.getIntMotionStatus();
-    if (motionDetected) {
+    bool motionDetected = sensorBMI160.getRestDetected();
+    if (!motionDetected) {
         Serial.println("Motion detected, not entering sleep mode.");
         return; // If motion is detected, do not enter sleep mode
     }
-
-    // Enter power-down state, device will wake up when motion is detected (via getIntMotionStatus)
-    LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); // Sleep until an interrupt occurs (motion detected)
+    LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); 
     Serial.println("Woke up from sleep mode...");
 }
 /* End of sleep mode implementation */
@@ -146,8 +143,9 @@ void loop()
     sensorManager.update();
     battery.Loop();
     ledManager.update();
+
  /* NEW IMPLEMENTATION OF CONTROLLER SLEEP MODE */
-       if (sensorBMI160.getIntMotionStatus()) {
+       if (!sensorBMI160.getRestDetected()) {
         // Serial.println("Motion detected.");
         lastMotionTime = millis();
     }
