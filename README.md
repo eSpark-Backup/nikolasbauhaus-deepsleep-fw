@@ -89,19 +89,25 @@ After update Platformio automatically start to configure the new board.
 
 1- Navigate to the main.cpp File.
 
-After successfully adding your code, open the main.cpp file in your project
+After successfully adding your code, open the main.cpp file in your project. Click on tick to compile, it will take some time for compilation. 
 
 ![image](https://github.com/user-attachments/assets/c3b77af8-1007-4821-9aee-e3fd9fed27d8)
 
-2- Configure the Build:
-
-A pop-up screen will appear. Click on the  ` Configure CMake Options Visibility ` option to proceed compilation.
-
-![image](https://github.com/user-attachments/assets/8afc44cc-2824-4448-a7a5-bfeb5d01a479)
-
-3- Successfully Compile.
+2- Successfully Compile.
 
 ![image](https://github.com/user-attachments/assets/23aedbdc-63df-49e2-a277-64ef02826775)
+
+## Step 5 : Flashing.
+Click on arrow to flash.
+
+![image](https://github.com/user-attachments/assets/9f7b07cd-b1ba-4945-a0c9-c869ebddb43d)
+
+
+
+
+
+
+ 
 
 
 
