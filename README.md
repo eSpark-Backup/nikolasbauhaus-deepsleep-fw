@@ -8,10 +8,55 @@ Implement a wake-on-movement functionality to an existing esp32-based open sourc
 - BMI270/LSM6DSV16X for IMU.
 
  
-### Installation Of ESP-IDF
-Install ESP-IDF from the extension of VS Code and configure.
+## Step 1 : Install the ESP-IDF Extension for VS Code
 
-### Installation Of PlatformIO IDE.
+#### 1- Open Visual Studio Code (VS Code):
+
+Launch VS Code on your computer.
+
+#### 2- Go to the Extensions View:
+
+Press Ctrl+Shift+X (Cmd+Shift+X on macOS) to open the Extensions view, or click on the Extensions icon located in the left sidebar of VS Code.
+
+#### 3- Search for ESP-IDF:
+
+In the Extensions search bar, type ESP-IDF.
+
+#### 4- Install the ESP-IDF Extension:
+
+Find ESP-IDF by Espressif Systems and click Install.
+
+## Step 2 : Install ESP-IDF Tools.
+
+#### 1- Open the Command Palette:
+
+Press Ctrl+Shift+P (Cmd+Shift+P on macOS) to open the Command Palette.
+
+#### 2- Run ESP-IDF: Configure ESP-IDF:
+
+1- Type ESP-IDF: Configure ESP-IDF extension and select it from the list.
+
+2- This command will guide you through the process of downloading and installing the required tools.
+
+![image](https://github.com/user-attachments/assets/2a091adc-d428-4892-8b4e-72ad1948321a)
+
+#### 3- Select the Installation Path:
+
+When prompted, select a directory where the ESP-IDF tools will be installed (e.g., C:\esp-idf or a directory of your choice).
+
+#### 4- Install Dependencies:
+
+The extension will ask to install Python dependencies and other necessary tools.
+Follow the prompts to install Python packages, Git, CMake, Ninja, and other dependencies required for ESP-IDF development
+
+#### 5- Verify the Installation:
+
+Once the installation is complete, you can verify that everything is set up correctly by opening a new terminal in VS Code and typing
+
+`idf.py --version`
+
+## Step 3 : Installation Of PlatformIO IDE.
+
 Install PlatformIO IDE from the extension of VS Code. PlatformIO IDE will automatically install in VS Code and may prompt you to reload or restart vs-code after installation.
 
 #### 1- Launch PlatformIO IDE
@@ -40,7 +85,7 @@ upload_speed = 921600
 After update Platformio automatically start to configure the new board.  
 ![image](https://github.com/user-attachments/assets/e0036caa-d62b-4b1e-8e27-ebeeb5eb51ec)
 
-### Compilation Process.
+## Step 4 : Compilation Process.
 
 1- Navigate to the main.cpp File.
 
