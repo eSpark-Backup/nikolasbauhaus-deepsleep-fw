@@ -8,7 +8,7 @@ Implement a wake-on-movement functionality to an existing esp32-based open sourc
 - BMI270/LSM6DSV16X for IMU.
 
  
-## Step 1 : Install the ESP-IDF Extension for VS Code
+## Step 1 : Install the ESP-IDF(v5.2.1) Extension for VS Code
 
 #### 1- Open Visual Studio Code (VS Code):
 
@@ -55,7 +55,7 @@ Once the installation is complete, you can verify that everything is set up corr
 
 `idf.py --version`
 
-## Step 3 : Installation Of PlatformIO IDE.
+## Step 3 : Installation Of PlatformIO IDE(v3.3.3).
 
 Install PlatformIO IDE from the extension of VS Code. PlatformIO IDE will automatically install in VS Code and may prompt you to reload or restart vs-code after installation.
 
