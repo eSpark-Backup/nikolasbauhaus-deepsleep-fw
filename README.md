@@ -8,55 +8,15 @@ Implement a wake-on-movement functionality to an existing esp32-based open sourc
 - BMI270/LSM6DSV16X for IMU.
 - Platformio for ESP32
 
- 
-## Step 1 : Install the ESP-IDF(v5.2.1) Extension for VS Code
+-------------------------------------------------------------------------------------------------
 
-#### 1- Open Visual Studio Code (VS Code):
+D3 is defined as MPI270 IMU interrupt pin which is RTC wakeup capable
 
-Launch VS Code on your computer.
+D2 is defined as external LED which will blink with desired pattern
 
-#### 2- Go to the Extensions View:
+-------------------------------------------------------------------------------------------------
 
-Press Ctrl+Shift+X (Cmd+Shift+X on macOS) to open the Extensions view, or click on the Extensions icon located in the left sidebar of VS Code.
-
-#### 3- Search for ESP-IDF:
-
-In the Extensions search bar, type ESP-IDF.
-
-#### 4- Install the ESP-IDF Extension:
-
-Find ESP-IDF by Espressif Systems and click Install.
-
-## Step 2 : Install ESP-IDF Tools.
-
-#### 1- Open the Command Palette:
-
-Press Ctrl+Shift+P (Cmd+Shift+P on macOS) to open the Command Palette.
-
-#### 2- Run ESP-IDF: Configure ESP-IDF:
-
-1- Type ESP-IDF: Configure ESP-IDF extension and select it from the list.
-
-2- This command will guide you through the process of downloading and installing the required tools.
-
-![image](https://github.com/user-attachments/assets/2a091adc-d428-4892-8b4e-72ad1948321a)
-
-#### 3- Select the Installation Path:
-
-When prompted, select a directory where the ESP-IDF tools will be installed (e.g., C:\esp-idf or a directory of your choice).
-
-#### 4- Install Dependencies:
-
-The extension will ask to install Python dependencies and other necessary tools.
-Follow the prompts to install Python packages, Git, CMake, Ninja, and other dependencies required for ESP-IDF development
-
-#### 5- Verify the Installation:
-
-Once the installation is complete, you can verify that everything is set up correctly by opening a new terminal in VS Code and typing
-
-`idf.py --version`
-
-## Step 3 : Installation Of PlatformIO IDE(v3.3.3).
+## Step 1 : Installation Of PlatformIO IDE.
 
 Install PlatformIO IDE from the extension of VS Code. PlatformIO IDE will automatically install in VS Code and may prompt you to reload or restart vs-code after installation.
 
@@ -73,20 +33,27 @@ Alternatively, you can also open the PlatformIO Home by clicking the PlatformIO 
 Once PlatformIO is installed and running, you can set up your project:
 
 #### 1- Open the Project:
-In PlatformIO Home, click on Open Project `SlimeVR-Tracker-ESP-main`.
-![image](https://github.com/user-attachments/assets/4d2d811d-372e-4124-b3c3-b1266c4f46b7)
+In PlatformIO Home, click on Open Project and select `Firmware` folder.
+![image](https://github.com/user-attachments/assets/9c639124-fd57-44d6-9b5c-4d8c81e8d68c)
 
 #### 2- Update the board in `platformio.ini` file. 
 ```ini
-[env:seeed_xiao_esp32c3]
-platform = espressif32
+[env:esp32c3]
+platform = espressif32 @ 6.7.0
+platform_packages =
+  framework-arduinoespressif32 @ https://github.com/espressif/arduino-esp32.git#3.0.1
+  framework-arduinoespressif32-libs @ https://github.com/espressif/arduino-esp32/releases/download/3.0.1/esp32-arduino-libs-3.0.1.zip
+build_flags =
+  ${env.build_flags}
+  -DESP32C3
 board = seeed_xiao_esp32c3
 upload_speed = 921600
 ```
-After update Platformio automatically start to configure the new board.  
-![image](https://github.com/user-attachments/assets/e0036caa-d62b-4b1e-8e27-ebeeb5eb51ec)
 
-## Step 4 : Compilation Process.
+After update Platformio automatically start to configure the new board.
+![image](https://github.com/user-attachments/assets/37ff8b0a-50f7-470c-b2e5-b00a046590e7)
+
+## Step 2 : Compilation Process.
 
 1- Navigate to the main.cpp File.
 
