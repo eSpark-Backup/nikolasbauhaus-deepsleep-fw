@@ -10,6 +10,8 @@ Implement a wake-on-movement functionality to an existing esp32-based open sourc
 
 -------------------------------------------------------------------------------------------------
 
+BMI270 IMU driver modified to configure interrupt pin.
+
 D3 is defined as MPI270 IMU interrupt pin which is RTC wakeup capable
 
 D2 is defined as external LED which will blink with desired pattern
