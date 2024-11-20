@@ -32,10 +32,6 @@
 #include "logging/Logger.h"
 // #include "driver/rtc_io.h"
 
-#define SEC_TO_MILLIS(x)   (x*1000)
-#define MIN_TO_SEC(x)   (x*60)
-#define MIN_TO_MILLIS(x)   (MIN_TO_SEC(x)*1000)
-
 #define WAKEUP_GPIO              PIN_IMU_INT     // Only RTC IO are allowed
 
 Timer<> globalTimer;
@@ -55,13 +51,11 @@ unsigned long lastStatePrint = 0;
 bool secondImuActive = false;
 BatteryMonitor battery;
 
-volatile uint64_t motionDetectionTime = 0;
-// volatile bool motionDetected = false;
+volatile unsigned long motionDetectionTime = 0;
 RTC_DATA_ATTR bool isSleeping = false;
 
 void IRAM_ATTR isr() {
 	motionDetectionTime = millis();
-	// motionDetected = true;
 }
 
 void print_wakeup_reason() {
@@ -104,7 +98,7 @@ void setup()
     // Blink attached LED with desired pattern
     if(isSleeping)
     {
-        ledManager.pattern(SEC_TO_MILLIS(1), SEC_TO_MILLIS(1), 3);
+        ledManager.pattern(LED_PATTERN);
         isSleeping = false;
     }
 
@@ -163,8 +157,8 @@ void loop()
     battery.Loop();
     ledManager.update();
 
-    // Goto sleep if no motion detected for desired period
-    if((millis()- motionDetectionTime) > MIN_TO_MILLIS(5))
+    // Goto sleep if no motion detected for threashold time
+    if((millis()- motionDetectionTime) > DEEP_SLEEP_THRESHOLD)
     {
         isSleeping = true;
         detachInterrupt(WAKEUP_GPIO);

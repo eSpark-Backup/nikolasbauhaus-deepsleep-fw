@@ -35,6 +35,18 @@
 #define PRIMARY_IMU_OPTIONAL false
 #define SECONDARY_IMU_OPTIONAL true
 
+
+#define SECOND_TO_MILLIS(x)   (x*1000)
+#define MINUTE_TO_SECOND(x)   (x*60)
+#define MINUTE_TO_MILLIS(x)   (MINUTE_TO_SECOND(x)*1000)
+
+// #define DEEP_SLEEP_THRESHOLD   SECOND_TO_MILLIS(5)    // if threashold time is defined in secs
+#define DEEP_SLEEP_THRESHOLD   MINUTE_TO_MILLIS(5)    // if threashold time is defined in mins
+
+// LED blinking pattern on wakeup from deep sleep
+//                            timeon,              timeoff,             no of repetitions)
+#define LED_PATTERN           SECOND_TO_MILLIS(1), SECOND_TO_MILLIS(1), 3
+
 #define MAX_IMU_COUNT 1
 
 // Axis mapping example

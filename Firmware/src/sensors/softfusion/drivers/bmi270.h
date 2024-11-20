@@ -323,7 +323,9 @@ struct BMI270
 
         // Interrupt pin settings
         i2c.writeReg(Regs::Interrupt_Feat::Interrupt1::reg, Regs::Interrupt_Feat::anyMotion);
-        i2c.writeReg(Regs::Interrupt_Io_Control::Interrupt1::reg, Regs::FifoConfig1::value);
+        i2c.writeReg(Regs::Interrupt_Io_Control::Interrupt1::reg, Regs::Interrupt_Io_Control::value);
+        // i2c.writeReg(Regs::Interrupt_Feat::Interrupt2::reg, Regs::Interrupt_Feat::anyMotion);
+        // i2c.writeReg(Regs::Interrupt_Io_Control::Interrupt2::reg, Regs::Interrupt_Io_Control::value);
         i2c.writeReg(Regs::Interrupt_Latch::reg, Regs::Interrupt_Latch::noLatch);
 
         delay(4);
