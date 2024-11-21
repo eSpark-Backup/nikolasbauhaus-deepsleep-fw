@@ -6,7 +6,7 @@
 Implement a wake-on-movement functionality to an existing esp32-based open source project, the open source project that needs to be expanded is shared under docs. Device should sleep after 5 minutes of little-to-no-movement scenario, and wake upon movement. Upon wake up, the charge indicator (red LED on XIAO esp32c3) should flash three times. Components are: 
 - Xiao ESP32-C3 for MCU
 - BMI270 breakout board for IMU.
-- LSM6DSV16X based custom schematic for IMU. [Schematic PDF]([url](https://github.com/eSpark-Consultants/nikolasbauhaus-deepsleep-fw/blob/main/docs/Schematic/ESP32-C3-MINI-1U_LSM6DSV16XTR_Board_v1.pdf)) pushed to docs.
+- LSM6DSV16X based custom schematic for IMU. [Schematic PDF](https://github.com/eSpark-Consultants/nikolasbauhaus-deepsleep-fw/blob/main/docs/Schematic/ESP32-C3-MINI-1U_LSM6DSV16XTR_Board_v1.pdf) pushed to docs.
 - Platformio for ESP32
 
  
