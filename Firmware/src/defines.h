@@ -47,6 +47,31 @@
 //                            timeon,              timeoff,             no of repetitions)
 #define LED_PATTERN           SECOND_TO_MILLIS(1), SECOND_TO_MILLIS(1), 3
 
+// #if (IMU == IMU_BMI270)
+// Enable or disable any motion detection feature
+#define ANY_MOTION_DETECT   1
+// Defines number of consecutive data points for which the threshold condition must be respected, for interrupt assertion.
+// It is expressed in 50Hz samples (20ms). Range is 0-163secs
+#define MOTION_DURATION     0x05    // default 0x5  (100ms)         (max 13-bit value)
+// Enable/Disable any motion detection on axis. 1 is enable, 0 is disable
+#define SELECT_X_AXIS   1
+#define SELECT_Y_AXIS   1
+#define SELECT_Z_AXIS   1
+// Slope threshold value for any motion detection. Range is 0-1g
+#define SLOPE_THRESHOLD     0xAA    // default 0xAA  (83mg)         (max 11-bit value)
+// Enabling bits for output into the status register bits.
+// 0x00    disable   Output of feature not assigned to any interrupt bits 0..7 of INT_STATUS_0 and INT1/2_MAP_FEAT
+// 0x01    BIT_0     Output assigned to bit-0
+// 0x02    BIT_1     Output assigned to bit-1
+// 0x03    BIT_2     Output assigned to bit-2
+// 0x04    BIT_3     Output assigned to bit-3
+// 0x05    BIT_4     Output assigned to bit-4
+// 0x06    BIT_5     Output assigned to bit-5
+// 0x07    BIT_6     Output assigned to bit-6
+// 0x08    BIT_7     Output assigned to bit-7
+#define OUTPUT_CONFIG       0x07    // default 0x07  (BIT_6)        (max 4-bit value)
+// #endif
+
 #define MAX_IMU_COUNT 1
 
 // Axis mapping example

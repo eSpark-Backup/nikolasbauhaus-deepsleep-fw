@@ -32,6 +32,20 @@
 namespace SlimeVR::Sensors::SoftFusion::Drivers
 {
 
+/*! @name Mask definitions for BMI2 any and no-motion feature configuration */
+#define BMI2_ANY_MOT_DUR_MASK                      UINT16_C(0x1FFF)
+#define BMI2_ANY_MOT_X_SEL_MASK                    UINT16_C(0x2000)
+#define BMI2_ANY_MOT_Y_SEL_MASK                    UINT16_C(0x4000)
+#define BMI2_ANY_MOT_Z_SEL_MASK                    UINT16_C(0x8000)
+#define BMI2_ANY_MOT_THRES_MASK                    UINT16_C(0x07FF)
+#define BMI2_ANY_MOT_OUT_CONF_MASK                 UINT16_C(0x7800)
+#define BMI2_ANY_MOT_EN_MASK                       UINT16_C(0x8000)
+#define BMI2_ANY_MOT_X_SEL_POS                     13
+#define BMI2_ANY_MOT_Y_SEL_POS                     14
+#define BMI2_ANY_MOT_Z_SEL_POS                     15
+#define BMI2_ANY_MOT_OUT_CONF_POS                  11
+#define BMI2_ANY_MOT_FEAT_ENABLE_POS               15
+
 // Driver uses acceleration range at 16g
 // and gyroscope range at 1000dps
 // Gyroscope ODR = 400Hz, accel ODR = 100Hz
@@ -239,6 +253,21 @@ struct BMI270
             static constexpr uint8_t value = (1 << 7); // gyr_gain_en = 1
         };
 
+        struct AnyMotion1 { // on feature page 1!
+            static constexpr uint8_t reg = 0x3C;
+            static constexpr uint16_t value =   ( MOTION_DURATION & BMI2_ANY_MOT_DUR_MASK)
+                                              | ( (SELECT_X_AXIS << BMI2_ANY_MOT_X_SEL_POS) & BMI2_ANY_MOT_X_SEL_MASK)
+                                              | ( (SELECT_Y_AXIS << BMI2_ANY_MOT_Y_SEL_POS) & BMI2_ANY_MOT_Y_SEL_MASK)
+                                              | ( (SELECT_Z_AXIS << BMI2_ANY_MOT_Z_SEL_POS) & BMI2_ANY_MOT_Z_SEL_MASK);
+        };
+
+        struct AnyMotion2 { // on feature page 1!
+            static constexpr uint8_t reg = 0x3E;
+            static constexpr uint16_t value =   ( SLOPE_THRESHOLD & BMI2_ANY_MOT_THRES_MASK)
+                                              | ( (OUTPUT_CONFIG << BMI2_ANY_MOT_OUT_CONF_POS) & BMI2_ANY_MOT_OUT_CONF_MASK)
+                                              | ( (ANY_MOTION_DETECT << BMI2_ANY_MOT_FEAT_ENABLE_POS) & BMI2_ANY_MOT_EN_MASK);
+        };
+
         static constexpr uint8_t FeatPage = 0x2f;
 
         static constexpr uint8_t GyrUserGain = 0x78; // undocumented reg, got from official bmi270 driver
@@ -256,6 +285,21 @@ struct BMI270
         static constexpr uint8_t GyrDataBit = 0b00001000;
         static constexpr uint8_t AccelDataBit = 0b00000100;
     };
+
+    void setupAnyMotionDetection()
+    {
+        i2c.writeReg(Regs::FeatPage, 1);
+        // const auto value = static_cast<int16_t>(i2c.readReg16(Regs::AnyMotion1::reg));
+        i2c.writeReg16(Regs::AnyMotion1::reg, Regs::AnyMotion1::value);
+        i2c.writeReg16(Regs::AnyMotion2::reg, Regs::AnyMotion2::value);
+
+        // Interrupt pin settings
+        i2c.writeReg(Regs::Interrupt_Feat::Interrupt1::reg, Regs::Interrupt_Feat::anyMotion);
+        i2c.writeReg(Regs::Interrupt_Io_Control::Interrupt1::reg, Regs::Interrupt_Io_Control::value);
+        // i2c.writeReg(Regs::Interrupt_Feat::Interrupt2::reg, Regs::Interrupt_Feat::anyMotion);
+        // i2c.writeReg(Regs::Interrupt_Io_Control::Interrupt2::reg, Regs::Interrupt_Io_Control::value);
+        i2c.writeReg(Regs::Interrupt_Latch::reg, Regs::Interrupt_Latch::noLatch);
+    }
 
     bool restartAndInit() {
         // perform initialization step
@@ -321,12 +365,7 @@ struct BMI270
         i2c.writeReg(Regs::FifoConfig0::reg, Regs::FifoConfig0::value);
         i2c.writeReg(Regs::FifoConfig1::reg, Regs::FifoConfig1::value);
 
-        // Interrupt pin settings
-        i2c.writeReg(Regs::Interrupt_Feat::Interrupt1::reg, Regs::Interrupt_Feat::anyMotion);
-        i2c.writeReg(Regs::Interrupt_Io_Control::Interrupt1::reg, Regs::Interrupt_Io_Control::value);
-        // i2c.writeReg(Regs::Interrupt_Feat::Interrupt2::reg, Regs::Interrupt_Feat::anyMotion);
-        // i2c.writeReg(Regs::Interrupt_Io_Control::Interrupt2::reg, Regs::Interrupt_Io_Control::value);
-        i2c.writeReg(Regs::Interrupt_Latch::reg, Regs::Interrupt_Latch::noLatch);
+        setupAnyMotionDetection();
 
         delay(4);
         i2c.writeReg(Regs::Cmd::reg, Regs::Cmd::valueFifoFlush);
@@ -352,9 +391,9 @@ struct BMI270
         // only Accel ON
         i2c.writeReg(Regs::PwrCtrl::reg, Regs::PwrCtrl::valueAccOn);
         delay(100);
-        i2c.writeReg(Regs::GyrCrtConf::reg, Regs::GyrCrtConf::valueRunning);
         i2c.writeReg(Regs::FeatPage, 1);
         i2c.writeReg16(Regs::GTrig1::reg, Regs::GTrig1::valueTriggerCRT);
+        i2c.writeReg(Regs::GyrCrtConf::reg, Regs::GyrCrtConf::valueRunning);
         i2c.writeReg(Regs::Cmd::reg, Regs::Cmd::valueGTrigger);
         delay(200);
 
