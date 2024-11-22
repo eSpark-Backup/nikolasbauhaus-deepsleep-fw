@@ -28,6 +28,7 @@
 #include <algorithm>
 
 #include "lsm6ds-common.h"
+#include "lsm6dsvfw.h"
 
 namespace SlimeVR::Sensors::SoftFusion::Drivers
 {
@@ -62,6 +63,10 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
             static constexpr uint8_t value = 0x70;
         };
         static constexpr uint8_t OutTemp = 0x20;
+        struct FUNCCFGACCESS {
+            static constexpr uint8_t reg = 0x01;
+            static constexpr uint8_t value = (0x00); // default = 0x00
+        };
         struct HAODRCFG {
             static constexpr uint8_t reg = 0x62;
             static constexpr uint8_t value = (0b00); //1st ODR table
@@ -78,6 +83,30 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
             static constexpr uint8_t reg = 0x12;
             static constexpr uint8_t valueSwReset = 1;
             static constexpr uint8_t value = (1 << 6) | (1 << 2); //BDU = 1, IF_INC = 1
+        };
+        struct Int1Ctrl {
+            static constexpr uint8_t reg = 0x0D;
+            static constexpr uint8_t value = 0; //default = 0x00
+        };
+        struct Int2Ctrl {
+            static constexpr uint8_t reg = 0x0E;
+            static constexpr uint8_t value = (1 << 7); //INT2_EMB_FUNC_ENDOP = 1
+        };
+        struct Ctrl4C {
+            static constexpr uint8_t reg = 0x13;
+            static constexpr uint8_t value = (1 << 4) | (1 << 3) | (1 << 1) | (1 << 0); //INT2_on_INT1 = 1, DRDY_MASK = 1, INT2_IN_LH = Active_high
+        };
+        struct Ctrl10C {
+            static constexpr uint8_t reg = 0x19;
+            static constexpr uint8_t value = 0;//(1 << 6); //EMB_FUNC_DEBUG = enabled
+        };
+        struct AllIntSrc {
+            static constexpr uint8_t reg = 0x1D;
+            static constexpr uint8_t value = (1 << 7); //EMB_FUNC_IA = enabled
+        };
+        struct WakeUpSrc {
+            static constexpr uint8_t reg = 0x45;
+            static constexpr uint8_t value = 0; //
         };
         struct Ctrl6GFS {
             static constexpr uint8_t reg = 0x15;
@@ -104,6 +133,26 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         : LSM6DSOutputHandler<I2CImpl>(i2c, logger) {
     }
 
+    void initializeEmbeddedFunctionInterrupt()
+    {
+        ucf_line_t* programPointer = (ucf_line_t *)SlimeVR::Sensors::SoftFusion::Drivers::lsm6dsv16x_activity_recognition_fw;
+        int32_t programLength = sizeof(lsm6dsv16x_activity_recognition_fw) / sizeof(ucf_line_t);
+
+        for (int32_t LineCounter = 0; LineCounter < programLength; LineCounter++)
+        {
+            if(!i2c.writeReg(programPointer[LineCounter].address, programPointer[LineCounter].data))
+            {
+                // while(1)
+                // {
+                //     /* drive addressable led here for error indication */
+                //     delay(100);
+                // }
+            }
+        }
+        // indicate, write successfull
+        i2c.writeReg(Regs::FUNCCFGACCESS::reg, Regs::FUNCCFGACCESS::value);
+    }
+
     bool initialize()
     {
         // perform initialization step
@@ -117,6 +166,8 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         i2c.writeReg(Regs::Ctrl8XLFS::reg, Regs::Ctrl8XLFS::value);
         i2c.writeReg(Regs::FifoCtrl3BDR::reg, Regs::FifoCtrl3BDR::value);
         i2c.writeReg(Regs::FifoCtrl4Mode::reg, Regs::FifoCtrl4Mode::value);
+
+        initializeEmbeddedFunctionInterrupt();
         return true;
     }
 
