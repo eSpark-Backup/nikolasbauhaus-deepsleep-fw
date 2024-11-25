@@ -40,14 +40,22 @@ namespace SlimeVR
     void LEDManager::on()
     {
 #if ENABLE_LEDS
+#if (IMU == IMU_LSM6DSV)
+        neopixelWrite(LED_PIN, 0, 255, 0);
+#else
         digitalWrite(m_Pin, LED__ON);
+#endif
 #endif
     }
 
     void LEDManager::off()
     {
 #if ENABLE_LEDS
+#if (IMU == IMU_LSM6DSV)
+        neopixelWrite(LED_PIN, 0, 0, 0);
+#else
         digitalWrite(m_Pin, LED__OFF);
+#endif
 #endif
     }
 

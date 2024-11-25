@@ -70,7 +70,7 @@
 // 0x07    BIT_6     Output assigned to bit-6
 // 0x08    BIT_7     Output assigned to bit-7
 #define OUTPUT_CONFIG       0x07    // default 0x07  (BIT_6)        (max 4-bit value)
-// #endif
+// #endif   // (IMU == IMU_BMI270)
 
 #define MAX_IMU_COUNT 1
 

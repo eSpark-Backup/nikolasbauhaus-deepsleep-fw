@@ -30,7 +30,6 @@
 #include "serial/serialcommands.h"
 #include "batterymonitor.h"
 #include "logging/Logger.h"
-// #include "driver/rtc_io.h"
 
 #define WAKEUP_GPIO              PIN_IMU_INT     // Only RTC IO are allowed
 
@@ -141,8 +140,7 @@ void setup()
 
     sensorManager.postSetup();
 
-    pinMode(PIN_IMU_INT, INPUT_PULLDOWN);
-	attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT), isr, RISING);
+	attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT), isr, FALLING);
 
     loopTime = micros();
 }
@@ -162,7 +160,8 @@ void loop()
     {
         isSleeping = true;
         detachInterrupt(WAKEUP_GPIO);
-        esp_deep_sleep_enable_gpio_wakeup(WAKEUP_GPIO, ESP_GPIO_WAKEUP_GPIO_HIGH);
+        esp_deep_sleep_enable_gpio_wakeup(1 << WAKEUP_GPIO, ESP_GPIO_WAKEUP_GPIO_LOW);
+        ledManager.off();
         esp_deep_sleep_start();
     }
 

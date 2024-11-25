@@ -94,7 +94,7 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         };
         struct Ctrl4C {
             static constexpr uint8_t reg = 0x13;
-            static constexpr uint8_t value = (1 << 4) | (1 << 3) | (1 << 1) | (1 << 0); //INT2_on_INT1 = 1, DRDY_MASK = 1, INT2_IN_LH = Active_high
+            static constexpr uint8_t value = (1 << 4) | (1 << 3) | (1 << 1);// | (1 << 0); //INT2_on_INT1 = 1, DRDY_MASK = 1, DRDY_PULSED = pulsed, INT2_IN_LH = Active_low
         };
         struct Ctrl10C {
             static constexpr uint8_t reg = 0x19;
@@ -142,15 +142,23 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         {
             if(!i2c.writeReg(programPointer[LineCounter].address, programPointer[LineCounter].data))
             {
-                // while(1)
-                // {
-                //     /* drive addressable led here for error indication */
-                //     delay(100);
-                // }
+                while(1)
+                {
+                    /* drive addressable led here for error indication */
+                    neopixelWrite(LED_PIN, 255, 0, 0);
+                    delay(200);
+                    neopixelWrite(LED_PIN, 0, 0, 0);
+                    delay(200);
+                }
             }
         }
         // indicate, write successfull
+        neopixelWrite(LED_PIN, 0, 0, 255);
+        delay(200);
+        neopixelWrite(LED_PIN, 0, 0, 0);
+
         i2c.writeReg(Regs::FUNCCFGACCESS::reg, Regs::FUNCCFGACCESS::value);
+        i2c.writeReg(Regs::Ctrl4C::reg, Regs::Ctrl4C::value);
     }
 
     bool initialize()
