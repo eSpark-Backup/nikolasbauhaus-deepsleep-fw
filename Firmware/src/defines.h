@@ -26,7 +26,7 @@
 // ================================================
 
 // Set parameters of IMU and board used
-#define IMU IMU_LSM6DSV
+#define IMU IMU_BMI270
 #define SECOND_IMU IMU
 #define BOARD BOARD_XIAO_ESP32C3
 #define IMU_ROTATION DEG_270
@@ -227,11 +227,11 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
   #define LED_PIN 16
   #define LED_INVERTED true
 #elif BOARD == BOARD_XIAO_ESP32C3
-  #define PIN_IMU_SDA 3 //
-  #define PIN_IMU_SCL 2 //
-  #define PIN_IMU_INT 4 //     // only RTC pins can be used to wakeup from deep sleep
+  #define PIN_IMU_SDA 8 //
+  #define PIN_IMU_SCL 9 //
+  #define PIN_IMU_INT 2 //     // only RTC pins can be used to wakeup from deep sleep
   #define PIN_IMU_INT_2 10 // D10
-  #define LED_PIN 6 // D2
+  #define LED_PIN 4 // D2
   #define LED_INVERTED false
   #define PIN_BATTERY_LEVEL 5 // 
   #ifndef BATTERY_SHIELD_RESISTANCE

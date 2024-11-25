@@ -54,7 +54,7 @@ namespace SlimeVR::Sensors::SoftFusion::Drivers
 template <typename I2CImpl>
 struct BMI270
 {
-    static constexpr uint8_t Address = 0x68;
+    static constexpr uint8_t Address = 0x69;
     static constexpr auto Name = "BMI270";
     static constexpr auto Type = ImuID::BMI270;
 
@@ -134,7 +134,8 @@ struct BMI270
             struct Interrupt2 {
                 static constexpr uint8_t reg = 0x54;
             };
-            static constexpr uint8_t value = 0x0A;          // Active HIGH, Push-Pull, Output enable, Input disable
+            // static constexpr uint8_t value = 0x0A;          // Active HIGH, Push-Pull, Output enable, Input disable
+            static constexpr uint8_t value = 0x08;          // Active LOW,  Push-Pull, Output enable, Input disable
         };
 
         struct Interrupt_Latch {
