@@ -52,9 +52,11 @@ BatteryMonitor battery;
 
 volatile unsigned long motionDetectionTime = 0;
 RTC_DATA_ATTR bool isSleeping = false;
+volatile bool motionDetected = false;
 
 void IRAM_ATTR isr() {
 	motionDetectionTime = millis();
+    motionDetected = true;
 }
 
 void print_wakeup_reason() {
@@ -158,11 +160,20 @@ void loop()
     // Goto sleep if no motion detected for threashold time
     if((millis()- motionDetectionTime) > DEEP_SLEEP_THRESHOLD)
     {
+        logger.debug("Sleep threashold time exceeded.");
+        logger.debug("Last motion detected on %dms. Current time: %dms.", motionDetectionTime, millis());
+
         isSleeping = true;
         detachInterrupt(WAKEUP_GPIO);
         esp_deep_sleep_enable_gpio_wakeup(1 << WAKEUP_GPIO, ESP_GPIO_WAKEUP_GPIO_LOW);
         ledManager.off();
         esp_deep_sleep_start();
+    }
+
+    if(motionDetected)
+    {
+        logger.debug("Motion detected on %dms. Current time: %dms.", motionDetectionTime, millis());
+        motionDetected = false;
     }
 
 #ifdef TARGET_LOOPTIME_MICROS
