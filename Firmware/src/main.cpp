@@ -142,6 +142,7 @@ void setup()
 
     sensorManager.postSetup();
 
+    pinMode(PIN_IMU_INT, INPUT);
 	attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT), isr, FALLING);
 
     loopTime = micros();

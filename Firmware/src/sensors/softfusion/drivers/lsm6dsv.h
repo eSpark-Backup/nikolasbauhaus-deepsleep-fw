@@ -94,7 +94,7 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         };
         struct Ctrl4C {
             static constexpr uint8_t reg = 0x13;
-            static constexpr uint8_t value = (1 << 4) | (1 << 3) | (1 << 1);// | (1 << 0); //INT2_on_INT1 = 1, DRDY_MASK = 1, DRDY_PULSED = pulsed, INT2_IN_LH = Active_low
+            static constexpr uint8_t value = (1 << 4) | (0 << 3) | (1 << 1);// | (1); //INT2_on_INT1 = 1, DRDY_MASK = disabled, DRDY_PULSED = pulsed, INT2_IN_LH = Active_low
         };
         struct Ctrl10C {
             static constexpr uint8_t reg = 0x19;
