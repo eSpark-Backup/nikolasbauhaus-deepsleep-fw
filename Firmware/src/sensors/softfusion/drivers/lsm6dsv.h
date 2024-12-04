@@ -33,6 +33,31 @@
 namespace SlimeVR::Sensors::SoftFusion::Drivers
 {
 
+#define BV(x, y)        (x & 0x01) << y
+#define BV2(x, y)       (x & 0x03) << y
+
+#define INT2_on_INT1(x)         (BV(x, 4))
+#define DRDY_MASK(x)            (BV(x, 3))
+#define INT2_DRDY_TEMP(x)       (BV(x, 2))
+#define DRDY_PULSED(x)          (BV(x, 1))
+#define INT2_IN_LH(x)           (BV(x, 0))
+
+#define INT_SLEEP_CHANGE(x)        (BV(x, 7))
+#define INT_SINGLE_TAP(x)          (BV(x, 6))
+#define INT_WU(x)                  (BV(x, 5))
+#define INT_FF(x)                  (BV(x, 4))
+#define INT_DOUBLE_TAP(x)          (BV(x, 3))
+#define INT_6D(x)                  (BV(x, 2))
+#define INT_EMB_FUNC(x)            (BV(x, 1))
+#define INT1_SHUB(x)               (BV(x, 0))
+#define INT2_TIMESTAMP(x)          (BV(x, 0))
+
+#define INTERRUPTS_ENABLE(x)       (BV(x, 7))
+#define TIMESTAMP_EN(x)            (BV(x, 6))
+#define DIS_RST_LIR_ALL_INT(x)     (BV(x, 3))
+#define INACT_EN_(x)               (BV2(x, 0))
+
+
 // Driver uses acceleration range at 8g
 // and gyroscope range at 1000dps
 // Gyroscope ODR = 480Hz, accel ODR = 120Hz
@@ -73,7 +98,8 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         };
         struct Ctrl1XLODR {
             static constexpr uint8_t reg = 0x10;
-            static constexpr uint8_t value = (0b0010110); //120Hz, HAODR
+            // static constexpr uint8_t value = (0b0010110); //120Hz, HAODR
+            static constexpr uint8_t value = 0x50; //120Hz, HAODR
         };
         struct Ctrl2GODR {
             static constexpr uint8_t reg = 0x11;
@@ -94,7 +120,31 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         };
         struct Ctrl4C {
             static constexpr uint8_t reg = 0x13;
-            static constexpr uint8_t value = (1 << 4) | (0 << 3) | (1 << 1);// | (1); //INT2_on_INT1 = 1, DRDY_MASK = disabled, DRDY_PULSED = pulsed, INT2_IN_LH = Active_low
+            static constexpr uint8_t value = INT2_on_INT1(1) | DRDY_MASK(0) | INT2_DRDY_TEMP(0) | DRDY_PULSED(1) | INT2_IN_LH(0); //INT2_on_INT1 = 1, DRDY_MASK = disabled, DRDY_PULSED = pulsed, INT2_IN_LH = Active_low
+        };
+        struct MD1CFG {
+            static constexpr uint8_t reg = 0x5E;
+            static constexpr uint8_t value = ( INT_SLEEP_CHANGE(0) | INT_SINGLE_TAP(0) | INT_WU(1)
+                                             | INT_FF(0) | INT_DOUBLE_TAP(0) | INT_6D(0) | INT_EMB_FUNC(0)
+                                             | INT1_SHUB(0) );
+        };
+        struct MD2CFG {
+            static constexpr uint8_t reg = 0x5F;
+            static constexpr uint8_t value = ( INT_SLEEP_CHANGE(0) | INT_SINGLE_TAP(0) | INT_WU(0)
+                                             | INT_FF(0) | INT_DOUBLE_TAP(0) | INT_6D(0) | INT_EMB_FUNC(1)
+                                             | INT2_TIMESTAMP(0) );
+        };
+        struct FUNCENABLE {
+            static constexpr uint8_t reg = 0x50;
+            static constexpr uint8_t value = INTERRUPTS_ENABLE(1) | TIMESTAMP_EN(0) | DIS_RST_LIR_ALL_INT(0) | INACT_EN_(0);
+        };
+        struct WAKEUPDUR {
+            static constexpr uint8_t reg = 0x5C;
+            static constexpr uint8_t value = 0x02;
+        };
+        struct WAKEUPTHR {
+            static constexpr uint8_t reg = 0x5B;
+            static constexpr uint8_t value = 0x02;
         };
         struct Ctrl10C {
             static constexpr uint8_t reg = 0x19;
@@ -106,7 +156,7 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         };
         struct WakeUpSrc {
             static constexpr uint8_t reg = 0x45;
-            static constexpr uint8_t value = 0; //
+            static constexpr uint8_t value = 0; //Read-only register
         };
         struct Ctrl6GFS {
             static constexpr uint8_t reg = 0x15;
@@ -114,7 +164,8 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         };
         struct Ctrl8XLFS {
             static constexpr uint8_t reg = 0x17;
-            static constexpr uint8_t value = (0b10); //8g
+            // static constexpr uint8_t value = (0b10); //8g
+            static constexpr uint8_t value = (0b00); //8g
         };
         struct FifoCtrl3BDR {
             static constexpr uint8_t reg = 0x09;
@@ -175,7 +226,12 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         i2c.writeReg(Regs::FifoCtrl3BDR::reg, Regs::FifoCtrl3BDR::value);
         i2c.writeReg(Regs::FifoCtrl4Mode::reg, Regs::FifoCtrl4Mode::value);
 
-        initializeEmbeddedFunctionInterrupt();
+        // initializeEmbeddedFunctionInterrupt();
+        
+        i2c.writeReg(Regs::WAKEUPDUR::reg, Regs::WAKEUPDUR::value);
+        i2c.writeReg(Regs::WAKEUPTHR::reg, Regs::WAKEUPTHR::value);
+        i2c.writeReg(Regs::FUNCENABLE::reg, Regs::FUNCENABLE::value);
+        i2c.writeReg(Regs::MD1CFG::reg, Regs::MD1CFG::value);
         return true;
     }
 
