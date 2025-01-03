@@ -94,14 +94,14 @@ void setup()
     logger.info("SlimeVR v" FIRMWARE_VERSION " starting up...");
 
     statusManager.setStatus(SlimeVR::Status::LOADING, true);
-
-    ledManager.setup();
     // Blink attached LED with desired pattern
     if(isSleeping)
     {
-        ledManager.pattern(LED_PATTERN);
+        // ledManager.pattern(LED_PATTERN);             // Blocking
+        statusManager.setStatus(SlimeVR::Status::DEVICE_WAKING_FROM_SLEEP, true);   // Non-Blocking
         isSleeping = false;
     }
+    ledManager.setup();
 
     configuration.setup();
 
@@ -159,21 +159,22 @@ void loop()
     ledManager.update();
 
     // Goto sleep if no motion detected for threashold time
-    if((millis()- motionDetectionTime) > DEEP_SLEEP_THRESHOLD)
+    if((millis()- statusManager.getActivityTime()) > DEEP_SLEEP_THRESHOLD)
     {
         logger.debug("Sleep threashold time exceeded.");
-        logger.debug("Last motion detected on %dms. Current time: %dms.", motionDetectionTime, millis());
+        logger.debug("Last activity detected on %dms. Current time: %dms.", statusManager.getActivityTime(), millis());
 
         isSleeping = true;
         detachInterrupt(WAKEUP_GPIO);
-        esp_deep_sleep_enable_gpio_wakeup(1 << WAKEUP_GPIO, ESP_GPIO_WAKEUP_GPIO_LOW);
-        ledManager.off();
+        esp_deep_sleep_enable_gpio_wakeup(1 << WAKEUP_GPIO, ESP_GPIO_WAKEUP_GPIO_HIGH);
+        ledManager.off(true);
+        delay(20);
         esp_deep_sleep_start();
     }
 
     if(motionDetected)
     {
-        logger.debug("Motion detected on %dms. Current time: %dms.", motionDetectionTime, millis());
+        statusManager.setActivityTime(motionDetectionTime);
         motionDetected = false;
     }
 

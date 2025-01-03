@@ -44,6 +44,9 @@
 #define SERVER_CONNECTING_LENGTH DEFAULT_LENGTH
 #define SERVER_CONNECTING_INTERVAL 3000
 #define SERVER_CONNECTING_COUNT 2
+#define WAKE_FROM_DEEPSLEEP_ONTIME  LED_ONTIME
+#define WAKE_FROM_DEEPSLEEP_OFFTIME LED_OFFTIME
+#define WAKE_FROM_DEEPSLEEP_COUNT   LED_REPITITIONS
 
 namespace SlimeVR
 {
@@ -58,19 +61,19 @@ namespace SlimeVR
     class LEDManager
     {
     public:
-        LEDManager(uint8_t pin) : m_Pin(pin) {}
+        LEDManager(uint8_t pin) : m_Pin(pin), m_red(false), m_green(false), m_blue(false) {}
 
         void setup();
 
         /*!
          *  @brief Turns the LED on
          */
-        void on();
+        void on(bool all = false);
 
         /*!
          *  @brief Turns the LED off
          */
-        void off();
+        void off(bool all = false);
 
         /*!
          *  @brief Blink the LED for [time]ms. *Can* cause lag
@@ -93,6 +96,7 @@ namespace SlimeVR
         unsigned long m_Timer = 0;
         LEDStage m_CurrentStage = OFF;
         unsigned long m_LastUpdate = millis();
+        bool m_red, m_green, m_blue;
 
         uint8_t m_Pin;
 

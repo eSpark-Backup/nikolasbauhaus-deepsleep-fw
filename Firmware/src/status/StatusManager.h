@@ -17,8 +17,12 @@ namespace SlimeVR
                 return m_Status;
             };
 
+            void setActivityTime(uint32_t time) {   m_ActivityTime = time;      m_Logger.info("Activity time updated: %dms", m_ActivityTime);      };
+            uint32_t getActivityTime()          {   return m_ActivityTime;      };
+
         private:
             uint32_t m_Status;
+            uint32_t m_ActivityTime;
 
             Logging::Logger m_Logger = Logging::Logger("StatusManager");
         };

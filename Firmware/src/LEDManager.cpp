@@ -37,22 +37,28 @@ namespace SlimeVR
         update();
     }
 
-    void LEDManager::on()
+    void LEDManager::on(bool all)
     {
 #if ENABLE_LEDS
 #if (BOARD_CUSTOM == BOARD)
-        neopixelWrite(LED_PIN, 0, 255, 0);
+        if(all)
+            neopixelWrite(m_Pin, LED_BRIGHTNESS, LED_BRIGHTNESS, LED_BRIGHTNESS);
+        else
+            neopixelWrite(m_Pin, (m_red?LED_BRIGHTNESS:0), (m_green?LED_BRIGHTNESS:0), (m_blue?LED_BRIGHTNESS:0));
 #else
         digitalWrite(m_Pin, LED__ON);
 #endif
 #endif
     }
 
-    void LEDManager::off()
+    void LEDManager::off(bool all)
     {
 #if ENABLE_LEDS
 #if (BOARD_CUSTOM == BOARD)
-        neopixelWrite(LED_PIN, 0, 0, 0);
+        if(all)
+            neopixelWrite(m_Pin, 0, 0, 0);
+        else
+            neopixelWrite(m_Pin, (m_red?LED_BRIGHTNESS:0), (m_green?LED_BRIGHTNESS:0), (m_blue?LED_BRIGHTNESS:0));
 #else
         digitalWrite(m_Pin, LED__OFF);
 #endif
@@ -61,9 +67,9 @@ namespace SlimeVR
 
     void LEDManager::blink(unsigned long time)
     {
-        on();
+        on(true);
         delay(time);
-        off();
+        off(true);
     }
 
     void LEDManager::pattern(unsigned long timeon, unsigned long timeoff, int times)
@@ -91,7 +97,27 @@ namespace SlimeVR
         unsigned int length = 0;
         unsigned int count = 0;
 
-        if (statusManager.hasStatus(Status::LOW_BATTERY))
+        if (statusManager.hasStatus(Status::DEVICE_WAKING_FROM_SLEEP))
+        {
+            count = WAKE_FROM_DEEPSLEEP_COUNT;
+            switch (m_CurrentStage)
+            {
+            case ON:
+                length = WAKE_FROM_DEEPSLEEP_OFFTIME;
+                m_blue = false;
+                break;
+            case OFF:
+            case GAP:
+                length = WAKE_FROM_DEEPSLEEP_ONTIME;
+                m_blue = true;
+                break;
+            case INTERVAL:
+                length = WAKE_FROM_DEEPSLEEP_OFFTIME*1000;
+                m_blue = false;
+                break;
+            }
+        }
+        else if (statusManager.hasStatus(Status::LOW_BATTERY))
         {
             count = LOW_BATTERY_COUNT;
             switch (m_CurrentStage)
@@ -99,12 +125,15 @@ namespace SlimeVR
             case ON:
             case OFF:
                 length = LOW_BATTERY_LENGTH;
+                m_red = false;
                 break;
             case GAP:
                 length = DEFAULT_GAP;
+                m_red = true;
                 break;
             case INTERVAL:
                 length = LOW_BATTERY_INTERVAL;
+                m_red = true;
                 break;
             }
         }
@@ -116,12 +145,15 @@ namespace SlimeVR
             case ON:
             case OFF:
                 length = IMU_ERROR_LENGTH;
+                m_red = false;
                 break;
             case GAP:
                 length = DEFAULT_GAP;
+                m_red = true;
                 break;
             case INTERVAL:
                 length = IMU_ERROR_INTERVAL;
+                m_red = true;
                 break;
             }
         }
@@ -133,12 +165,15 @@ namespace SlimeVR
             case ON:
             case OFF:
                 length = WIFI_CONNECTING_LENGTH;
+                m_green = false;
                 break;
             case GAP:
                 length = DEFAULT_GAP;
+                m_green = true;
                 break;
             case INTERVAL:
                 length = WIFI_CONNECTING_INTERVAL;
+                m_green = true;
                 break;
             }
         }
@@ -149,13 +184,16 @@ namespace SlimeVR
             {
             case ON:
             case OFF:
+                m_green = false;
                 length = SERVER_CONNECTING_LENGTH;
                 break;
             case GAP:
                 length = DEFAULT_GAP;
+                m_green = true;
                 break;
             case INTERVAL:
                 length = SERVER_CONNECTING_INTERVAL;
+                m_green = true;
                 break;
             }
         }
@@ -167,10 +205,12 @@ namespace SlimeVR
             {
             case ON:
             case OFF:
+                m_green = false;
                 length = STANDBUY_LENGTH;
                 break;
             case GAP:
                 length = DEFAULT_GAP;
+                m_green = true;
                 break;
             case INTERVAL:
                 length = LED_INTERVAL_STANDBY;
@@ -195,10 +235,13 @@ namespace SlimeVR
             case ON:
                 off();
                 m_CurrentCount++;
-                if (m_CurrentCount >= count)
-                {
-                    m_CurrentCount = 0;
-                    m_CurrentStage = INTERVAL;
+                if (m_CurrentCount >= count) {
+                  if (statusManager.hasStatus(Status::DEVICE_WAKING_FROM_SLEEP)) {
+                      statusManager.setStatus(Status::DEVICE_WAKING_FROM_SLEEP, false);
+                      m_blue = false;
+                  }
+                  m_CurrentStage = INTERVAL;
+                  m_CurrentCount = 0;
                 }
                 else
                 {

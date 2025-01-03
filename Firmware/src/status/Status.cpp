@@ -18,6 +18,8 @@ namespace SlimeVR
                 return "WIFI_CONNECTING";
             case SERVER_CONNECTING:
                 return "SERVER_CONNECTING";
+            case DEVICE_WAKING_FROM_SLEEP:
+                return "WOKE UP FROM SLEEP";
             default:
                 return "UNKNOWN";
             }

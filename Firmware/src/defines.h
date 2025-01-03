@@ -40,12 +40,23 @@
 #define MINUTE_TO_SECOND(x)   (x*60)
 #define MINUTE_TO_MILLIS(x)   (MINUTE_TO_SECOND(x)*1000)
 
-// #define DEEP_SLEEP_THRESHOLD   SECOND_TO_MILLIS(5)    // if threashold time is defined in secs
-#define DEEP_SLEEP_THRESHOLD   MINUTE_TO_MILLIS(5)    // if threashold time is defined in mins
+#define UPDATE_ON_NETWORK_ACTIVITY   true              // set true if you want to update activity timer for deep sleep control when network is connected
+#define DEEP_SLEEP_THRESHOLD   SECOND_TO_MILLIS(30)    // if threashold time is defined in secs
+// #define DEEP_SLEEP_THRESHOLD   MINUTE_TO_MILLIS(5)    // if threashold time is defined in mins
 
 // LED blinking pattern on wakeup from deep sleep
-//                            timeon,              timeoff,             no of repetitions)
-#define LED_PATTERN           SECOND_TO_MILLIS(1), SECOND_TO_MILLIS(1), 3
+#define LED_ONTIME          SECOND_TO_MILLIS(1)
+#define LED_OFFTIME         SECOND_TO_MILLIS(1)
+#define LED_REPITITIONS     3
+//                            timeon,     timeoff,  no of repetitions)
+#define LED_PATTERN         LED_ONTIME, LED_OFFTIME, LED_REPITITIONS
+
+// Define fade durations in milliseconds
+#define FADE_IN_DURATION 1000
+#define FADE_OUT_DURATION 1000
+
+// Define LED brightness (0-255)
+#define LED_BRIGHTNESS 10
 
 // #if (IMU == IMU_BMI270)
 // Enable or disable any motion detection feature
@@ -58,7 +69,7 @@
 #define SELECT_Y_AXIS   1
 #define SELECT_Z_AXIS   1
 // Slope threshold value for any motion detection. Range is 0-1g
-#define SLOPE_THRESHOLD     0xAA    // default 0xAA  (83mg)         (max 11-bit value)
+#define SLOPE_THRESHOLD     0x50    // default 0xAA  (83mg)         (max 11-bit value)
 // Enabling bits for output into the status register bits.
 // 0x00    disable   Output of feature not assigned to any interrupt bits 0..7 of INT_STATUS_0 and INT1/2_MAP_FEAT
 // 0x01    BIT_0     Output assigned to bit-0
@@ -93,7 +104,7 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
 //   BAT_EXTERNAL for ADC pin,
 //   BAT_INTERNAL for internal - can detect only low battery,
 //   BAT_MCP3021 for external ADC connected over I2C
-#define BATTERY_MONITOR BAT_EXTERNAL
+//#define BATTERY_MONITOR BAT_EXTERNAL
 
 // BAT_EXTERNAL definition override
 // D1 Mini boards with ESP8266 have internal resistors. For these boards you only have to adjust BATTERY_SHIELD_RESISTANCE.
@@ -192,6 +203,9 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
   #define PIN_BATTERY_LEVEL 5
   #define LED_PIN 6
   #define LED_INVERTED false
+  #define BATTERY_SHIELD_RESISTANCE 0
+  #define BATTERY_SHIELD_R1 200
+  #define BATTERY_SHIELD_R2 56
 #elif BOARD == BOARD_WROOM32
   #define PIN_IMU_SDA 21
   #define PIN_IMU_SCL 22
@@ -233,8 +247,8 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
   #define LED_PIN 16
   #define LED_INVERTED true
 #elif BOARD == BOARD_XIAO_ESP32C3
-  #define PIN_IMU_SDA 8 //
-  #define PIN_IMU_SCL 9 //
+  #define PIN_IMU_SDA 9 //
+  #define PIN_IMU_SCL 8 //
   #define PIN_IMU_INT 2 //     // only RTC pins can be used to wakeup from deep sleep
   #define PIN_IMU_INT_2 10 // D10
   #define LED_PIN 4 // D2

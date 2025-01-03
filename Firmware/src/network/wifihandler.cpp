@@ -127,6 +127,8 @@ void onConnected() {
     isWifiConnected = true;
     hadWifi = true;
     wifiHandlerLogger.info("Connected successfully to SSID '%s', ip address %s", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
+    if(UPDATE_ON_NETWORK_ACTIVITY)
+        statusManager.setActivityTime(millis());
 }
 
 uint8_t WiFiNetwork::getWiFiState() {

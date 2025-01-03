@@ -98,12 +98,11 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         };
         struct Ctrl1XLODR {
             static constexpr uint8_t reg = 0x10;
-            // static constexpr uint8_t value = (0b0010110); //120Hz, HAODR
-            static constexpr uint8_t value = 0x50; //120Hz, HAODR
+            static constexpr uint8_t value = 0x16; //120Hz, HAODR
         };
         struct Ctrl2GODR {
             static constexpr uint8_t reg = 0x11;
-            static constexpr uint8_t value = (0b0011000); //480Hz, HAODR
+            static constexpr uint8_t value = 0x18; //480Hz, HAODR
         };
         struct Ctrl3C {
             static constexpr uint8_t reg = 0x12;
@@ -174,6 +173,7 @@ struct LSM6DSV : LSM6DSOutputHandler<I2CImpl>
         struct FifoCtrl4Mode {
             static constexpr uint8_t reg = 0x0a;
             static constexpr uint8_t value = (0b110); //continuous mode
+            // static constexpr uint8_t value = (0b111); //bypass mode
         };
 
         static constexpr uint8_t FifoStatus = 0x1b;
